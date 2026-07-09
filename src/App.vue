@@ -14,7 +14,7 @@ watchEffect(() => {
   <div class="app-shell">
     <header class="site-header">
       <nav class="nav container" aria-label="主导航">
-        <RouterLink class="brand" to="/">Dismas Blog</RouterLink>
+        <RouterLink class="brand" to="/">D1smas的投资日记</RouterLink>
         <div class="nav-actions">
           <RouterLink to="/">首页</RouterLink>
           <RouterLink to="/about">关于</RouterLink>
