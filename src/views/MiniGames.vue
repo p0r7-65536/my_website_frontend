@@ -13,8 +13,7 @@
           <button class="modebtn" data-mode="single">單字對戰</button>
         </div>
         <p class="hint" id="modehint"></p>
-        <p class="source_and_link" id="source_and_link">這是一個台灣人做的小遊戲，原作者找不到，只能找到這個帖子：</p>
-        <a>https://x.com/satireorcry1/status/2067328444501795140?s=20</a>
+        <p class="hint" id="sourcelink">這是一個台灣人做的小遊戲，原作者找不到，只能找到這個帖子：<a>https://x.com/satireorcry1/status/2067328444501795140?s=20</a></p>
         <div class="grid">
           <div class="pcard p1">
             <h3><span class="dot p1"></span> 玩家一</h3>
