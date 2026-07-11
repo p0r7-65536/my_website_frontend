@@ -1,35 +1,38 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { getBoards } from '../api/boards'
 import { getPosts } from '../api/posts'
 import { getErrorMessage } from '../api/http'
 import PostCard from '../components/PostCard.vue'
 
 const route = useRoute()
+const board = ref(null)
 const posts = ref([])
 const loading = ref(true)
 const error = ref('')
 const page = ref(0)
 const totalPages = ref(0)
 
-const searchQuery = computed(() => String(route.query.q || '').trim().toLowerCase())
-
-const filteredPosts = computed(() => {
-  if (!searchQuery.value) return posts.value
-  return posts.value.filter((post) =>
-    post.title?.toLowerCase().includes(searchQuery.value),
-  )
-})
+async function loadBoard() {
+  const boards = await getBoards()
+  board.value = boards.find((b) => String(b.id) === route.params.id) || null
+}
 
 async function loadPosts() {
   loading.value = true
   error.value = ''
   try {
-    const data = await getPosts({ page: page.value, size: 20 })
+    await loadBoard()
+    const data = await getPosts({
+      boardId: route.params.id,
+      page: page.value,
+      size: 20,
+    })
     posts.value = data.content || []
     totalPages.value = data.totalPages || 0
   } catch (err) {
-    error.value = getErrorMessage(err, '帖子列表加载失败')
+    error.value = getErrorMessage(err, '帖子加载失败')
   } finally {
     loading.value = false
   }
@@ -41,13 +44,10 @@ function goPage(next) {
   loadPosts()
 }
 
-watch(
-  () => route.query.q,
-  () => {
-    page.value = 0
-    loadPosts()
-  },
-)
+watch(() => route.params.id, () => {
+  page.value = 0
+  loadPosts()
+})
 
 onMounted(loadPosts)
 </script>
@@ -55,24 +55,19 @@ onMounted(loadPosts)
 <template>
   <section class="page">
     <div class="page-header">
-      <h1>全部帖子</h1>
-      <p v-if="searchQuery" class="page-desc">
-        搜索「{{ route.query.q }}」的结果
-      </p>
-      <p v-else class="page-desc">浏览社区最新讨论</p>
+      <h1>{{ board?.name || '板块' }}</h1>
+      <p v-if="board?.description" class="page-desc">{{ board.description }}</p>
     </div>
 
     <div v-if="loading" class="state">正在加载帖子...</div>
     <div v-else-if="error" class="state error">{{ error }}</div>
-    <div v-else-if="filteredPosts.length === 0" class="state">
-      {{ searchQuery ? '没有找到匹配的帖子' : '暂无帖子，来发第一个吧！' }}
-    </div>
+    <div v-else-if="posts.length === 0" class="state">该板块暂无帖子</div>
 
     <div v-else class="post-list">
-      <PostCard v-for="post in filteredPosts" :key="post.id" :post="post" />
+      <PostCard v-for="post in posts" :key="post.id" :post="post" />
     </div>
 
-    <div v-if="!searchQuery && totalPages > 1" class="pagination">
+    <div v-if="totalPages > 1" class="pagination">
       <button class="btn btn-ghost btn-sm" :disabled="page === 0" @click="goPage(page - 1)">
         上一页
       </button>
