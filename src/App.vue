@@ -17,6 +17,7 @@ watchEffect(() => {
         <RouterLink class="brand" to="/">D1smas的投资日记</RouterLink>
         <div class="nav-actions">
           <RouterLink to="/">首页</RouterLink>
+          <RouterLink to="/games">小游戏：姓名戰鬥陀螺</RouterLink>
           <RouterLink to="/about">关于</RouterLink>
           <button class="theme-toggle" type="button" @click="isDark = !isDark">
             {{ isDark ? '浅色' : '深色' }}
